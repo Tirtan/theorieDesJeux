@@ -29,12 +29,11 @@ public class HexWindow {
 
         createView();
         createController();
-
     }
 
     private void createView() {
 
-        //gestion et cr�ation de la frame
+        //gestion et création de la frame
         frame = new JFrame("Hex");
         frame.setPreferredSize(new Dimension(frameWidth, frameHeight));
         frame.setResizable(false);
@@ -44,22 +43,20 @@ public class HexWindow {
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
 
-        //cr�ation du panel de jeu
-        panelJeu = new board(this);
+        //création du panel de jeu
+        panelJeu = new Board(this);
         panelJeu.setDoubleBuffered(true);
         panelJeu.setPreferredSize(new Dimension(frameWidth - 100, frameHeight - 100));
         panelJeu.setBackground(Color.lightGray);
 
 
-        //Ajout des panels � la frame
+        //Ajout des panels à la frame
         frame.add(panelJeu, BorderLayout.NORTH);
     }
 
     private void createController() {
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-
     }
 
     public void refresh() {
