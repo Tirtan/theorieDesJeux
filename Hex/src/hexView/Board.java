@@ -110,6 +110,7 @@ public class Board extends JPanel {
                 g.drawPolygon(board[i][j].getPolygone());
             }
         }
+
     }
 
     public void chemin(int x1, int y1, int x2, int y2) {
