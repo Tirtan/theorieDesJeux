@@ -41,7 +41,6 @@ public class HexWindow {
 
         frame.pack();
         frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
 
         //création du panel de jeu
         panelJeu = new Board(this);
@@ -52,6 +51,7 @@ public class HexWindow {
 
         //Ajout des panels à la frame
         frame.add(panelJeu, BorderLayout.NORTH);
+        frame.setVisible(true);
     }
 
     private void createController() {

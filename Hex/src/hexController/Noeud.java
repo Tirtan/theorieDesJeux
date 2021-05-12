@@ -2,15 +2,31 @@ package hexController;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.List;
 
 public class Noeud {
 
+    private static final Color baseColor = new Color(219, 195, 153);
+
     private static int nbNoeud;
     private int id, heuristique;
-    private List<Noeud> voisins;
+    private ArrayList<Noeud> voisins;
     private Polygon polygone;
     private boolean cliquable;
+
+    private Color couleur;
+
+    private int colonne, ligne;
+
+    public Noeud(int colonne, int ligne) {
+        this.id = ++Noeud.nbNoeud;
+        this.voisins = new ArrayList<>();
+        this.polygone = new Polygon();
+        this.heuristique = 0;
+        this.cliquable = true;
+        this.couleur = baseColor;
+        this.colonne = colonne;
+        this.ligne = ligne;
+    }
 
     public Noeud() {
         this.id = ++Noeud.nbNoeud;
@@ -18,37 +34,24 @@ public class Noeud {
         this.polygone = new Polygon();
         this.heuristique = 0;
         this.cliquable = true;
-    }
-
-    public Noeud(List<Noeud> voisins) {
-        this.id = ++Noeud.nbNoeud;
-        this.voisins = voisins;
-        this.polygone = new Polygon();
-        this.heuristique = 0;
-        this.cliquable = true;
-    }
-
-    public Noeud(int heuristique) {
-        this.id = ++Noeud.nbNoeud;
-        this.voisins = new ArrayList<>();
-        this.polygone = new Polygon();
-        this.heuristique = heuristique;
-        this.cliquable = true;
-    }
-
-    public Noeud(List<Noeud> voisins, int heuristique) {
-        this.id = ++Noeud.nbNoeud;
-        this.voisins = voisins;
-        this.polygone = new Polygon();
-        this.heuristique = heuristique;
-        this.cliquable = true;
+        this.couleur = baseColor;
+        this.colonne = 0;
+        this.ligne = 0;
     }
 
     public int getId() {
         return this.id;
     }
 
-    public List<Noeud> getVoisins() {
+    public int getColonne() {
+        return this.colonne;
+    }
+
+    public int getLigne() {
+        return this.ligne;
+    }
+
+    public ArrayList<Noeud> getVoisins() {
         return this.voisins;
     }
 
@@ -65,8 +68,16 @@ public class Noeud {
         return null;
     }
 
+    public Color getCouleur() {
+        return this.couleur;
+    }
+
+    public void setCouleur(Color couleur) {
+        this.couleur = couleur;
+    }
+
     public boolean isCliquable() {
-        return this.cliquable;
+        return this.couleur == baseColor;
     }
 
     public void cliquer() {

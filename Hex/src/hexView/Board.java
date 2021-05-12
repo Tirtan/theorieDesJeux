@@ -5,11 +5,13 @@ import hexController.Noeud;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
-public class Board extends JPanel {
+public class Board extends JPanel implements MouseListener {
 
     private static final int SIDES = 6;
     private static final int SIDE_LENGTH = 50;
@@ -33,6 +35,7 @@ public class Board extends JPanel {
 
         window = hexWindow;
 
+        this.addMouseListener(this);
         HexagonButton(9, 9);
     }
 
@@ -44,37 +47,30 @@ public class Board extends JPanel {
         board = new Noeud[this.row][this.col];
 
 
-        for (int i = 0; i < this.row; i = i + 2) {
+        for (int i = 0; i < this.row; i++) {
             for (int j = 0; j < this.col; j++) {
                 board[i][j] = createPoly(this.x, this.y);
+                this.x += 100;
+            }
+            this.x = 50 * (i+2);
+            this.y += 75;
+        }
 
+        for (int i = 0; i < this.row; i++) {
+            for (int j = 0; j < this.col; j++) {
                 if (i > 0) board[i][j].ajouterVoisin(board[i-1][j]);
                 if (j > 0) board[i][j].ajouterVoisin(board[i][j-1]);
                 if (i < this.row-1) board[i][j].ajouterVoisin(board[i+1][j]);
                 if (j < this.col-1) board[i][j].ajouterVoisin(board[i][j+1]);
                 if (i > 0 && j < this.col-1) board[i][j].ajouterVoisin(board[i-1][j+1]);
                 if (i < this.row-1 && j > 0) board[i][j].ajouterVoisin(board[i+1][j-1]);
-
-                this.x += 100;
-            }
-            this.x = 50 * (i + 2);
-            this.y += 75;
-            if (i + 1 < this.row) {
-                for (int j = 0; j < this.col; j++) {
-                    board[i + 1][j] = createPoly(this.x, this.y);
-
-                    this.x += 100;
-
-                }
-                this.x = 50 * (i + 3);
-                this.y += 75;
             }
         }
     }
 
     public Noeud createPoly(int x, int y) {
 
-        Noeud hex = new Noeud();
+        Noeud hex = new Noeud(x, y);
         int[] x1 = {4, 2, 2, 4, 6, 6};
         int[] y2 = {2, 3, 5, 6, 5, 3};
         for (int i = 0; i < SIDES; i++) {
@@ -93,24 +89,14 @@ public class Board extends JPanel {
 
         g.fillRect(50 + 50 * board[1].length, +100 + 75 * board[1].length, 100 * board.length, 25);
 
-        /*for (Noeud[] noeuds : Board) {
-            for (Noeud noeud : noeuds) {
-                g.setColor(new Color(245, 222, 179));
-                g.fillPolygon(noeud.getPolygone());
-                g.setColor(Color.GRAY);
-                g.drawPolygon(noeud.getPolygone());
-            }
-        }*/
-
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
-                g.setColor(new Color(245, 222, 179));
+                g.setColor(board[i][j].getCouleur());
                 g.fillPolygon(board[i][j].getPolygone());
-                g.setColor(Color.GRAY);
+                g.setColor(Color.gray);
                 g.drawPolygon(board[i][j].getPolygone());
             }
         }
-
     }
 
     public void chemin(int x1, int y1, int x2, int y2) {
@@ -140,33 +126,167 @@ public class Board extends JPanel {
 
         noeud.setHeuristique(0);
 
-        Iterator<Noeud> it = noeud.getVoisins().iterator();
-        Iterator<Noeud> itVoisin = null;
-        //Iterator<Noeud> itVoisin2 = null;
-        Noeud voisin1, voisin2, voisin3 = null;
+        ArrayList<Noeud> alV1 = new ArrayList<Noeud>();
+        ArrayList<Noeud> alV2 = new ArrayList<Noeud>();
 
-        while(it.hasNext()) {
+        ArrayList<Noeud> listeVoisinsCourants;
 
-            voisin1 = it.next();
-            if(!voisin1.getVoisins().isEmpty()) {
-                itVoisin = voisin1.getVoisins().iterator();
-                while(itVoisin.hasNext()) {
-                    voisin2 = itVoisin.next();
-                    if(!voisin2.getVoisins().isEmpty()) {
-                        itVoisin = voisin2.getVoisins().iterator();
-                        while(itVoisin.hasNext()) {
-                            voisin3 = itVoisin.next();
-                            if(voisin3.isCliquable()) voisin3.setHeuristique(8 + voisin3.getId());
+        ArrayList<ArrayList<Noeud>> listeliste = new ArrayList<>();
+        listeliste.add(new ArrayList<Noeud>() {{
+            add(noeud);
+        }});
+
+        int iteration = 0;
+
+        Color[] colortab = {
+                new Color(10, 10, 10),
+                new Color(20, 20, 20),
+                new Color(30, 30, 30),
+                new Color(40, 40, 40),
+                new Color(50, 50, 50),
+                new Color(60, 60, 60),
+                new Color(70, 70, 70),
+                new Color(80, 80, 80),
+                new Color(90, 90, 90),
+                new Color(100, 100, 100),
+                new Color(110, 110, 110),
+                new Color(120, 120, 120),
+                new Color(140, 140, 140),
+                new Color(150, 150, 150),
+                new Color(160, 160, 160),
+                new Color(170, 170, 170),
+                new Color(180, 180, 180),
+                new Color(190, 190, 190),
+                new Color(200, 200, 200),
+                new Color(210, 210, 210),
+                new Color(220, 220, 220),
+                new Color(230, 230, 230),
+                new Color(240, 240, 240),
+                new Color(250, 250, 250)
+        };
+
+        boolean bord = false;
+
+        while(!bord && listeliste.size() > 0) {
+            System.out.println(listeliste.size());
+            listeVoisinsCourants = listeliste.remove(0);
+            for (Noeud voisin : listeVoisinsCourants) {
+                if (voisin.getColonne() == 0/* ||
+                        voisin.getLigne() == 0 ||
+                        voisin.getColonne() == board.length-1 ||
+                        voisin.getLigne() == board[voisin.getColonne()].length-1*/) {
+                    bord = true;
+                }
+                if(voisin.isCliquable()) {
+                    voisin.setHeuristique(9 - iteration);
+                    voisin.setCouleur(colortab[iteration%colortab.length]);
+                    listeliste.add(new ArrayList<Noeud>());
+                    for(Noeud v : voisin.getVoisins()) {
+                        if (v.isCliquable()) {
+                            listeliste.get(0).add(v);
                         }
-                        if(voisin2.isCliquable()) voisin2.setHeuristique(9 + voisin2.getId());
                     }
                 }
-                if(voisin1.isCliquable()) voisin1.setHeuristique(10 + voisin1.getId());
+            }
+            iteration++;
+        }
+
+        /*
+        for (Noeud v1 : noeud.getVoisins()) {
+            if(v1.isCliquable()) {
+                alV1.add(v1);
+                v1.setHeuristique(10 + v1.getId());
+                v1.setCouleur(Color.RED);
             }
         }
+
+        for (Noeud v2 : alV1) {
+            for (Noeud v4 : v2.getVoisins()) {
+                if(v4.isCliquable()) {
+                    alV2.add(v4);
+                    v4.setHeuristique(9 + v4.getId());
+                    v4.setCouleur(Color.GREEN);
+                }
+            }
+        }
+
+        for (Noeud v3 : alV2) {
+            for (Noeud v4 : v3.getVoisins()) {
+                if(v4.isCliquable()) {
+                    v4.setHeuristique(8 + v4.getId());
+                    v4.setCouleur(Color.BLUE);
+                }
+            }
+        }
+        */
+        repaint();
     }
 
     public void alphaBeta(Noeud s, Arbre arbre, int alpha, int beta) {
+
+    }
+
+    /**
+     * Invoked when the mouse button has been clicked (pressed
+     * and released) on a component.
+     *
+     * @param e
+     */
+    @Override
+    public void mouseClicked(MouseEvent e) {
+
+    }
+
+    /**
+     * Invoked when a mouse button has been pressed on a component.
+     *
+     * @param e
+     */
+    @Override
+    public void mousePressed(MouseEvent e) {
+        for(int i = 0 ; i < board.length; i++){
+            for(int j = 0 ; j < board[1].length; j++){
+                if (board[i][j].getPolygone().contains(new Point(e.getX(),e.getY())) && board[i][j].isCliquable()){
+                    //System.out.println(board[i][j].isCliquable());
+                    calculHeuristique(board[i][j]);
+                    board[i][j].setCouleur(Color.BLACK);
+                    /*for (Noeud n :board[i][j].getVoisins()){
+                        n.setCouleur(Color.white);
+                    }*/
+                    System.out.println("j'ai clic ici " + e.getX() +" , "+ e.getY());
+                }
+            }
+        }
+        repaint();
+    }
+
+    /**
+     * Invoked when a mouse button has been released on a component.
+     *
+     * @param e
+     */
+    @Override
+    public void mouseReleased(MouseEvent e) {
+
+    }
+
+    /**
+     * Invoked when the mouse enters a component.
+     *
+     * @param e
+     */
+    @Override
+    public void mouseEntered(MouseEvent e) {
+
+    }
+
+    /**
+     * Invoked when the mouse exits a component.
+     *
+     * @param e
+     */
+    @Override
+    public void mouseExited(MouseEvent e) {
 
     }
 }
