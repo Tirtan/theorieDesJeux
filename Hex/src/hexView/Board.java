@@ -363,6 +363,7 @@ public class Board extends JPanel implements MouseListener {
                 for(int j = 0 ; j < board[1].length; j++){
                     if (board[i][j].getPolygone().contains(new Point(e.getX(),e.getY())) && board[i][j].isClickable()) {
                         board[i][j].setColor(Color.WHITE);
+                        repaint();
                         if (victoryCheck(Color.WHITE)) {
                             gameInProgress = false;
                             if (victoryPopUp(true)){
@@ -386,7 +387,6 @@ public class Board extends JPanel implements MouseListener {
                     }
                 }
             }
-            repaint();
         }
     }
 
