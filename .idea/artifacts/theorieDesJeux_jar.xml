@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="theorieDesJeux:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/theorieDesJeux_jar</output-path>
+    <root id="archive" name="theorieDesJeux.jar">
+      <element id="module-output" name="theorieDesJeux" />
+    </root>
+  </artifact>
+</component>
