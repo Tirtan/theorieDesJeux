@@ -324,9 +324,9 @@ public class Board extends JPanel implements MouseListener {
 
         String message;
         if (humanWon) {
-            message = "perdu";
-        } else {
             message = "gagné";
+        } else {
+            message = "perdu";
         }
         int choice = JOptionPane.showOptionDialog(null, //Component parentComponent
                 "Vous avez " + message + " ! Voulez-vous refaire une partie ?", //Object message,
