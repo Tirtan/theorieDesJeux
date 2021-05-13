@@ -1,7 +1,5 @@
 package hexView;
 
-import hexController.Controller;
-
 import javax.swing.*;
 import java.awt.*;
 
@@ -20,15 +18,9 @@ public class HexWindow {
     public JLabel labelJoueur;
     public JLabel labelTour;
 
-    //controller
-    public Controller controller;
-
     public HexWindow() {
 
-        controller = new Controller();
-
         createView();
-        createController();
     }
 
     private void createView() {
@@ -51,12 +43,8 @@ public class HexWindow {
 
         //Ajout des panels à la frame
         frame.add(panelJeu, BorderLayout.NORTH);
-        frame.setVisible(true);
-    }
-
-    private void createController() {
-
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
     }
 
     public void refresh() {

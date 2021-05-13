@@ -31,12 +31,15 @@ public class Board extends JPanel implements MouseListener {
 
     private HexWindow window;
 
-    private ArrayList<Noeud> botTokens;
+    private ArrayList<Noeud> coupsJoueParLeBot;
+
+    private boolean partieEnCours;
 
     public Board(HexWindow hexWindow) {
 
         window = hexWindow;
-        botTokens = new ArrayList<>();
+        coupsJoueParLeBot = new ArrayList<>();
+        partieEnCours = true;
 
         this.addMouseListener(this);
         HexagonButton(9, 9);
@@ -179,10 +182,10 @@ public class Board extends JPanel implements MouseListener {
             }
             iteration++;
         }
-        repaint();
+        //repaint();
     }
 
-    public Chemin aEtoile(Noeud s) {
+    public ArrayList<Noeud> aEtoile(Noeud s) {
         ArrayList<Noeud> omega = new ArrayList<>();
         Noeud pi[][] = new Noeud[board.length][board[0].length];
         for (int i = 0; i < pi.length; i++){
@@ -219,17 +222,14 @@ public class Board extends JPanel implements MouseListener {
             omega.remove(x);
         }
 
-        Chemin retour = new Chemin();
+        ArrayList<Noeud> retour = new ArrayList<>();
 
         if (x.getLigne() == board.length-1) {
             while (pi[x.getLigne()][x.getColonne()] != s) {
-                retour.ajouterNoeud(x);
-                //x.setCouleur(Color.RED);
+                retour.add(0, x);
                 x = pi[x.getLigne()][x.getColonne()];
             }
-            //x.setCouleur(Color.RED);
-            retour.ajouterNoeud(x);
-            //System.out.println(retour.getTailleChemin());
+            retour.add(0, x);
         }
 
         return retour;
@@ -238,7 +238,7 @@ public class Board extends JPanel implements MouseListener {
     public void botTour() {
         ArrayList<Noeud> coupsPossibles = new ArrayList<>();
         Noeud prochainCoup = null;
-        if (this.botTokens.isEmpty()) {
+        if (this.coupsJoueParLeBot.isEmpty()) {
             for(int i = 0; i < board[0].length; i++) {
                 if (board[0][i].isCliquable()) {
                     coupsPossibles.add(board[0][i]);
@@ -246,26 +246,121 @@ public class Board extends JPanel implements MouseListener {
             }
             prochainCoup = coupsPossibles.get((int) (Math.random() * coupsPossibles.size()));
         } else {
-            Chemin cheminTemp;
-            Chemin plusCourtChemin = null;
-            for (Noeud n : this.botTokens) {
+            ArrayList<Noeud> cheminTemp;
+            ArrayList<Noeud> plusCourtChemin = null;
+            for (Noeud n : this.coupsJoueParLeBot) {
                 cheminTemp = aEtoile(n);
-                if ( plusCourtChemin == null || cheminTemp.getTailleChemin() < plusCourtChemin.getTailleChemin() && cheminTemp.getTailleChemin() > 0) {
+                if ( plusCourtChemin == null || cheminTemp.size() < plusCourtChemin.size() && cheminTemp.size() > 0) {
                     plusCourtChemin = cheminTemp;
                 }
             }
-            if (plusCourtChemin != null && plusCourtChemin.getTailleChemin() > 0) {
-                prochainCoup = plusCourtChemin.getNoeud(0);
+            if (plusCourtChemin != null && plusCourtChemin.size() > 0) {
+                prochainCoup = plusCourtChemin.get(0);
             }
         }
         if (prochainCoup != null) {
             prochainCoup.setCouleur(Board.botColor);
-            this.botTokens.add(prochainCoup);
+            this.coupsJoueParLeBot.add(prochainCoup);
         }
     }
 
-    public void checkVictoire(Color couleur) {
+    public boolean checkVictoire(Color couleur) {
+        if (couleur == Color.BLACK) {
+            for(int cpt = 0; cpt < board[0].length; cpt++) {
+                if (board[0][cpt].getCouleur() == couleur) {
 
+                    Noeud s = board[0][cpt];
+
+                    ArrayList<Noeud> omega = new ArrayList<>();
+                    Noeud pi[][] = new Noeud[board.length][board[0].length];
+                    for (int i = 0; i < pi.length; i++){
+                        for (int j = 0; j < pi[0].length; j++){
+                            pi[i][j] = null;
+                            board[i][j].setDelta(Integer.MAX_VALUE);
+                            board[i][j].setF(Integer.MAX_VALUE);
+                        }
+                    }
+                    s.setF(s.getHeuristique());
+                    s.setDelta(0);
+                    Noeud x = s;
+                    omega.add(x);
+                    while (x.getLigne() != board.length-1 && !omega.isEmpty()) {
+                        x = omega.get(0);
+                        for(Noeud n : omega) {
+                            if (n.getHeuristique() < x.getHeuristique()){
+                                x = n;
+                            }
+                        }
+
+                        // Fonction Examiner() :
+                        for (Noeud y : x.getVoisinsCouleur(couleur)) {
+                            if ((x.getDelta() + 1) < y.getDelta()) {
+                                y.setDelta(x.getDelta() + 1);
+                                pi[y.getLigne()][y.getColonne()] = x;
+                                y.setF(y.getDelta() + y.getHeuristique());
+
+                                // Fonction Ouvrir()
+                                omega.add(y);
+                            }
+                        }
+                        // Fonction Fermer()
+                        omega.remove(x);
+                    }
+
+                    if (x.getLigne() == board.length-1) {
+                        return true;
+                    }
+                }
+            }
+        } else if (couleur == Color.WHITE) {
+            for(int cpt = 0; cpt < board.length; cpt++) {
+                if (board[cpt][0].getCouleur() == couleur) {
+
+                    Noeud s = board[cpt][0];
+
+                    ArrayList<Noeud> omega = new ArrayList<>();
+                    Noeud pi[][] = new Noeud[board.length][board[0].length];
+                    for (int i = 0; i < pi.length; i++){
+                        for (int j = 0; j < pi[0].length; j++){
+                            pi[i][j] = null;
+                            board[i][j].setDelta(Integer.MAX_VALUE);
+                            board[i][j].setF(Integer.MAX_VALUE);
+                        }
+                    }
+                    s.setF(s.getHeuristique());
+                    s.setDelta(0);
+                    Noeud x = s;
+                    omega.add(x);
+                    while (x.getColonne() != board[0].length-1 && !omega.isEmpty()) {
+                        x = omega.get(0);
+                        for(Noeud n : omega) {
+                            if (n.getHeuristique() < x.getHeuristique()){
+                                x = n;
+                            }
+                        }
+
+                        // Fonction Examiner() :
+                        for (Noeud y : x.getVoisinsCouleur(couleur)) {
+                            if ((x.getDelta() + 1) < y.getDelta()) {
+                                y.setDelta(x.getDelta() + 1);
+                                pi[y.getLigne()][y.getColonne()] = x;
+                                y.setF(y.getDelta() + y.getHeuristique());
+
+                                // Fonction Ouvrir()
+                                omega.add(y);
+                            }
+                        }
+                        // Fonction Fermer()
+                        omega.remove(x);
+                    }
+
+                    if (x.getColonne() == board[0].length-1) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -286,22 +381,24 @@ public class Board extends JPanel implements MouseListener {
      */
     @Override
     public void mousePressed(MouseEvent e) {
-        for(int i = 0 ; i < board.length; i++){
-            for(int j = 0 ; j < board[1].length; j++){
-                if (board[i][j].getPolygone().contains(new Point(e.getX(),e.getY())) && board[i][j].isCliquable()){
-                    //System.out.println(board[i][j].isCliquable());
-                    board[i][j].setCouleur(Color.WHITE);
-                    botTour();
-                    //calculHeuristique(board[i][j]);
-                    //aEtoile(board[i][j]);
-                    /*for (Noeud n :board[i][j].getVoisins()){
-                        n.setCouleur(Color.white);
-                    }*/
-                    //System.out.println("j'ai clic ici " + e.getX() +" , "+ e.getY());
+        if (partieEnCours) {
+            for(int i = 0 ; i < board.length; i++){
+                for(int j = 0 ; j < board[1].length; j++){
+                    if (board[i][j].getPolygone().contains(new Point(e.getX(),e.getY())) && board[i][j].isCliquable()) {
+                        board[i][j].setCouleur(Color.WHITE);
+                        if (checkVictoire(Color.WHITE)) {
+                            partieEnCours = false;
+                        } else {
+                            botTour();
+                            if (checkVictoire(Color.BLACK)) {
+                                partieEnCours = false;
+                            }
+                        }
+                    }
                 }
             }
+            repaint();
         }
-        repaint();
     }
 
     /**

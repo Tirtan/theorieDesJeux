@@ -11,7 +11,6 @@ public class Noeud {
     private int id, colonne, ligne, heuristique, delta, f;
     private ArrayList<Noeud> voisins;
     private Polygon polygone;
-    private boolean cliquable;
 
     private Color couleur;
 
@@ -19,7 +18,6 @@ public class Noeud {
         this.id = ++Noeud.nbNoeud;
         this.voisins = new ArrayList<>();
         this.polygone = new Polygon();
-        this.cliquable = true;
         this.couleur = baseColor;
         this.ligne = ligne;
         this.colonne = colonne;
@@ -32,7 +30,6 @@ public class Noeud {
         this.id = ++Noeud.nbNoeud;
         this.voisins = new ArrayList<>();
         this.polygone = new Polygon();
-        this.cliquable = true;
         this.couleur = baseColor;
         this.ligne = 0;
         this.colonne = 0;
@@ -116,10 +113,6 @@ public class Noeud {
 
     public boolean isCliquable() {
         return this.couleur == baseColor;
-    }
-
-    public void cliquer() {
-        this.cliquable = false;
     }
 
     public void ajouterVoisin(Noeud voisin) {
