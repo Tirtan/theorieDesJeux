@@ -207,9 +207,9 @@ public class Board extends JPanel implements MouseListener {
             ArrayList<Node> shortestPath = null;
             for (Node n : this.numberOfMovesFromBot) {
                 tempPath = aStar(n);
-                if ( shortestPath == null || tempPath.size() < shortestPath.size() && tempPath.size() > 0) {
+
                     shortestPath = tempPath;
-                }
+
             }
             if (shortestPath != null && shortestPath.size() > 0) {
                 nextMove = shortestPath.get(0);
