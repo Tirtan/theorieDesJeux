@@ -49,7 +49,7 @@ public class Board extends JPanel implements MouseListener {
 
         for (int i = 0; i < this.row; i++) {
             for (int j = 0; j < this.col; j++) {
-                board[i][j] = createPoly(this.x, this.y);
+                board[i][j] = createPoly(this.x, this.y, i, j);
                 this.x += 100;
             }
             this.x = 50 * (i+2);
@@ -68,9 +68,9 @@ public class Board extends JPanel implements MouseListener {
         }
     }
 
-    public Noeud createPoly(int x, int y) {
+    public Noeud createPoly(int x, int y, int ligne, int colonne) {
 
-        Noeud hex = new Noeud(x, y);
+        Noeud hex = new Noeud(ligne, colonne);
         int[] x1 = {4, 2, 2, 4, 6, 6};
         int[] y2 = {2, 3, 5, 6, 5, 3};
         for (int i = 0; i < SIDES; i++) {
@@ -97,14 +97,6 @@ public class Board extends JPanel implements MouseListener {
                 g.drawPolygon(board[i][j].getPolygone());
             }
         }
-    }
-
-    public void chemin(int x1, int y1, int x2, int y2) {
-        Noeud depart = this.board[y1][x1];
-        Noeud arrivee = this.board[y2][x2];
-
-        ArrayList<Noeud> hashListe = new ArrayList<>();
-        inserer(hashListe, depart);
     }
 
     private void inserer(ArrayList<Noeud> hashListe, Noeud depart) {
@@ -167,19 +159,13 @@ public class Board extends JPanel implements MouseListener {
 
         boolean bord = false;
 
-        while(!bord && listeliste.size() > 0) {
-            System.out.println(listeliste.size());
+        while( listeliste.size() > 0) {
             listeVoisinsCourants = listeliste.remove(0);
             for (Noeud voisin : listeVoisinsCourants) {
-                if (voisin.getColonne() == 0/* ||
-                        voisin.getLigne() == 0 ||
-                        voisin.getColonne() == board.length-1 ||
-                        voisin.getLigne() == board[voisin.getColonne()].length-1*/) {
-                    bord = true;
-                }
                 if(voisin.isCliquable()) {
-                    voisin.setHeuristique(9 - iteration);
-                    voisin.setCouleur(colortab[iteration%colortab.length]);
+                    voisin.setHeuristique(iteration);
+                    voisin.setDelta(1);
+                    voisin.setCouleur(colortab[voisin.getHeuristique()%colortab.length]);
                     listeliste.add(new ArrayList<Noeud>());
                     for(Noeud v : voisin.getVoisins()) {
                         if (v.isCliquable()) {
@@ -190,40 +176,54 @@ public class Board extends JPanel implements MouseListener {
             }
             iteration++;
         }
-
-        /*
-        for (Noeud v1 : noeud.getVoisins()) {
-            if(v1.isCliquable()) {
-                alV1.add(v1);
-                v1.setHeuristique(10 + v1.getId());
-                v1.setCouleur(Color.RED);
-            }
-        }
-
-        for (Noeud v2 : alV1) {
-            for (Noeud v4 : v2.getVoisins()) {
-                if(v4.isCliquable()) {
-                    alV2.add(v4);
-                    v4.setHeuristique(9 + v4.getId());
-                    v4.setCouleur(Color.GREEN);
-                }
-            }
-        }
-
-        for (Noeud v3 : alV2) {
-            for (Noeud v4 : v3.getVoisins()) {
-                if(v4.isCliquable()) {
-                    v4.setHeuristique(8 + v4.getId());
-                    v4.setCouleur(Color.BLUE);
-                }
-            }
-        }
-        */
         repaint();
     }
 
-    public void alphaBeta(Noeud s, Arbre arbre, int alpha, int beta) {
+    public Noeud aEtoile(Noeud s) {
+        ArrayList<Noeud> omega = new ArrayList<>();
+        Noeud pi[][] = new Noeud[board.length][board[0].length];
+        for (int i = 0; i < pi.length; i++){
+            for (int j = 0; j < pi[0].length; j++){
+                pi[i][j] = null;
+                board[i][j].setDelta(Integer.MAX_VALUE);
+                board[i][j].setF(Integer.MAX_VALUE);
+                System.out.println("Ligne : " + board[i][j].getLigne() + " | Colonne : " + board[i][j].getColonne());
+            }
+        }
+        s.setF(s.getHeuristique());
+        s.setDelta(0);
+        Noeud x = s;
+        omega.add(x);
+        int iteration = 0;
+        while (x.getColonne() != 0 && !omega.isEmpty()) {
+            x = omega.get(0);
+            for(Noeud n : omega) {
+                if (n.getHeuristique() < x.getHeuristique()){
+                    x = n;
+                }
+            }
 
+            // Fonction Examiner() :
+            for (Noeud y : x.getVoisins()) {
+                if ((x.getDelta() + 1) < y.getDelta()) {
+                    System.out.println(y.getLigne());
+                    y.setDelta(x.getDelta() + 1);
+                    pi[y.getLigne()][y.getColonne()] = x;
+                    y.setF(y.getDelta() + y.getHeuristique());
+
+                    // Fonction Ouvrir()
+                    omega.add(y);
+                }
+            }
+            // Fonction Fermer()
+            omega.remove(x);
+        }
+        while (pi[x.getLigne()][x.getColonne()] != s) {
+            x.setCouleur(Color.RED);
+            x = pi[x.getLigne()][x.getColonne()];
+        }
+        x.setCouleur(Color.RED);
+        return x;
     }
 
     /**
@@ -249,7 +249,8 @@ public class Board extends JPanel implements MouseListener {
                 if (board[i][j].getPolygone().contains(new Point(e.getX(),e.getY())) && board[i][j].isCliquable()){
                     //System.out.println(board[i][j].isCliquable());
                     calculHeuristique(board[i][j]);
-                    board[i][j].setCouleur(Color.BLACK);
+                    aEtoile(board[i][j]);
+                    board[i][j].setCouleur(Color.YELLOW);
                     /*for (Noeud n :board[i][j].getVoisins()){
                         n.setCouleur(Color.white);
                     }*/

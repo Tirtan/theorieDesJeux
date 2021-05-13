@@ -8,35 +8,53 @@ public class Noeud {
     private static final Color baseColor = new Color(219, 195, 153);
 
     private static int nbNoeud;
-    private int id, heuristique;
+    private int id, colonne, ligne, heuristique, delta, f;
     private ArrayList<Noeud> voisins;
     private Polygon polygone;
     private boolean cliquable;
 
     private Color couleur;
 
-    private int colonne, ligne;
-
-    public Noeud(int colonne, int ligne) {
+    public Noeud(int ligne, int colonne) {
         this.id = ++Noeud.nbNoeud;
         this.voisins = new ArrayList<>();
         this.polygone = new Polygon();
-        this.heuristique = 0;
         this.cliquable = true;
         this.couleur = baseColor;
-        this.colonne = colonne;
         this.ligne = ligne;
+        this.colonne = colonne;
+        this.heuristique = 0;
+        this.delta = 0;
+        this.f = 0;
     }
 
     public Noeud() {
         this.id = ++Noeud.nbNoeud;
         this.voisins = new ArrayList<>();
         this.polygone = new Polygon();
-        this.heuristique = 0;
         this.cliquable = true;
         this.couleur = baseColor;
-        this.colonne = 0;
         this.ligne = 0;
+        this.colonne = 0;
+        this.heuristique = 0;
+        this.delta = Integer.MAX_VALUE;
+        this.f = 0;
+    }
+
+    public int getDelta() {
+        return this.delta;
+    }
+
+    public void setDelta(int delta) {
+        this.delta = delta;
+    }
+
+    public int getF() {
+        return this.f;
+    }
+
+    public void setF(int f) {
+        this.f = f;
     }
 
     public int getId() {
@@ -119,6 +137,11 @@ public class Noeud {
     }
 
     public void setHeuristique(int heuristique) {
+
         this.heuristique = heuristique;
+    }
+
+    public int getHeuristique() {
+        return this.heuristique;
     }
 }
