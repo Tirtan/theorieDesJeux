@@ -73,6 +73,26 @@ public class Noeud {
         return this.voisins;
     }
 
+    public ArrayList<Noeud> getVoisinsCliquable() {
+        ArrayList<Noeud> alRetour = new ArrayList<>();
+        for (Noeud n : this.voisins) {
+            if (n.isCliquable()) {
+                alRetour.add(n);
+            }
+        }
+        return alRetour;
+    }
+
+    public ArrayList<Noeud> getVoisinsCouleur(Color couleur) {
+        ArrayList<Noeud> alRetour = new ArrayList<>();
+        for (Noeud n : this.voisins) {
+            if (n.getCouleur() == couleur) {
+                alRetour.add(n);
+            }
+        }
+        return alRetour;
+    }
+
     public Polygon getPolygone() {
         return this.polygone;
     }
