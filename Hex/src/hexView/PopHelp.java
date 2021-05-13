@@ -18,7 +18,7 @@ public class PopHelp extends JFrame {
                 "Le joueur blanc commence. Les joueurs jouent chacun leur " +
                 "tour. À chaque tour, le joueur place un pion de sa couleur sur une case libre" +
                 "du plateau. Le premier joueur qui réussit à relier ses deux bords par un" +
-                "chemin de pions contigus de sa couleur a gagné. Il ne peut y avoir qu'un pion" +
+                "chemin de pions continus de sa couleur a gagné. Il ne peut y avoir qu'un pion" +
                 "par case. Les pions posés le sont définitivement, ils ne peuvent être ni retirés," +
                 "ni déplacés.");
 
