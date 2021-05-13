@@ -11,7 +11,7 @@ public class Node {
 
     private static final Color baseColor = new Color(219, 195, 153);
 
-    private int id, column, line, heuristic, delta, f;
+    private int column, line, heuristic, delta, f;
     private ArrayList<Node> neighbors;
     private Polygon polygone;
     private Color color;
